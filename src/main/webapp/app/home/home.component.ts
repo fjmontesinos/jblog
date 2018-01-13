@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { JhiEventManager } from 'ng-jhipster';
-
-import { Account, LoginModalService, Principal } from '../shared';
+import {Post, PostService} from "../entities/post";
+import {ResponseWrapper} from "../shared";
 
 @Component({
     selector: 'jhi-home',
@@ -13,36 +11,26 @@ import { Account, LoginModalService, Principal } from '../shared';
 
 })
 export class HomeComponent implements OnInit {
-    account: Account;
-    modalRef: NgbModalRef;
+    posts: Post[] = [];
 
-    constructor(
-        private principal: Principal,
-        private loginModalService: LoginModalService,
-        private eventManager: JhiEventManager
-    ) {
+    constructor(private postService: PostService){
+
     }
 
-    ngOnInit() {
-        this.principal.identity().then((account) => {
-            this.account = account;
-        });
-        this.registerAuthenticationSuccess();
+    ngOnInit(){
+        console.log('ngOnInit...');
+        this.loadAll();
     }
 
-    registerAuthenticationSuccess() {
-        this.eventManager.subscribe('authenticationSuccess', (message) => {
-            this.principal.identity().then((account) => {
-                this.account = account;
-            });
-        });
-    }
-
-    isAuthenticated() {
-        return this.principal.isAuthenticated();
-    }
-
-    login() {
-        this.modalRef = this.loginModalService.open();
+    loadAll() {
+        this.postService.query().subscribe(
+            (res: ResponseWrapper) => {
+                console.log(res.json);
+                this.posts = res.json;
+            },
+            (res: ResponseWrapper) => {
+                console.log(res.json);
+            }
+        );
     }
 }
